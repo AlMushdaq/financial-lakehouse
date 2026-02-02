@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: raw_data
+    database: FINANCE_LAKE
+    schema: RAW
+    tables:
+      - name: MARKET_DATA
+        loaded_at_field: ingested_at
+        freshness:
+          warn_after: {count: 6, period: hour} # Warn if no data for 6 hours
+          error_after: {count: 24, period: hour} # Error if no data for 24 hours

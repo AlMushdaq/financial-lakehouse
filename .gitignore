@@ -1,0 +1,29 @@
+<<<<<<< HEAD
+.venv/
+=======
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db.venv/
+>>>>>>> 0f3fb2d (Fix nested dbt repository)
+.env
+__pycache__/
+dbt_finance/logs/
+dbt_finance/target/
+*.p8
