@@ -136,4 +136,4 @@ if __name__ == "__main__":
         load_to_snowflake(market_data)
     except Exception as e:
         logger.error(f"Pipeline Failed: {e}")
-        exit(1)# Force update
+        exit(1)
