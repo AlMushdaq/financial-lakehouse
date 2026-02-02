@@ -1,0 +1,65 @@
+name: Hourly Crypto Pipeline
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Run at the top of every hour
+  workflow_dispatch: # Allows you to run it manually to test
+
+jobs:
+  build_and_run:
+    runs-on: ubuntu-latest
+
+    env:
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      SNOWFLAKE_WAREHOUSE: COMPUTE_WH
+      SNOWFLAKE_DATABASE: FINANCE_LAKE
+      SNOWFLAKE_SCHEMA: RAW
+      SNOWFLAKE_TABLE: MARKET_DATA
+      COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+      COINGECKO_API_URL: "https://api.coingecko.com/api/v3/coins/markets"
+      # This tells dbt to look for profiles.yml in the current folder
+      DBT_PROFILES_DIR: ./
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install pandas snowflake-connector-python[pandas] requests tenacity python-dotenv dbt-snowflake
+
+      - name: 1. Run Ingestion (Python)
+        run: python scripts/ingest_crypto.py
+
+      - name: 2. Configure dbt Profile
+        # We create the profiles.yml file on the fly using your Secrets
+        run: |
+          echo "
+          dbt_finance:
+            target: dev
+            outputs:
+              dev:
+                type: snowflake
+                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+                user: ${{ secrets.SNOWFLAKE_USER }}
+                password: ${{ secrets.SNOWFLAKE_PASSWORD }}
+                role: TRANSFORMER_ROLE
+                database: FINANCE_LAKE
+                warehouse: COMPUTE_WH
+                schema: ANALYTICS
+                threads: 1
+          " > profiles.yml
+
+      - name: 3. Run Transformation (dbt)
+        run: |
+          cd dbt_finance
+          dbt deps
+          dbt run
+          dbt test
