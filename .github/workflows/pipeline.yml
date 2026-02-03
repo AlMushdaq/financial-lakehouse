@@ -36,7 +36,7 @@ jobs:
           pip install pandas snowflake-connector-python[pandas] requests tenacity python-dotenv dbt-snowflake
 
       - name: 1. Run Ingestion (Python)
-        run: python scripts/ingest_crypto.py
+        run: python scripts/run_pipeline.py
 
       - name: 2. Configure dbt Profile
         # We create the profiles.yml file on the fly using your Secrets
