@@ -2,8 +2,8 @@ name: Hourly Crypto Pipeline
 
 on:
   schedule:
-    - cron: '0 * * * *' # Run at the top of every hour
-  workflow_dispatch: # Allows you to run it manually to test
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
   build_and_run:
@@ -39,6 +39,7 @@ jobs:
       - name: 2. Configure dbt Profile
         run: |
           printf "dbt_finance:\n  target: dev\n  outputs:\n    dev:\n      type: snowflake\n      account: ${{ secrets.SNOWFLAKE_ACCOUNT }}\n      user: ${{ secrets.SNOWFLAKE_USER }}\n      password: ${{ secrets.SNOWFLAKE_PASSWORD }}\n      role: TRANSFORMER_ROLE\n      database: FINANCE_LAKE\n      warehouse: COMPUTE_WH\n      schema: ANALYTICS\n      threads: 1\n" > dbt_finance/profiles.yml
+
       - name: 3. Run Transformation (dbt)
         run: |
           cd dbt_finance
