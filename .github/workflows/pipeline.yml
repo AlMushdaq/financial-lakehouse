@@ -39,8 +39,8 @@ jobs:
         run: python scripts/run_pipeline.py
 
       - name: 2. Configure dbt Profile
-        # We create the profiles.yml file on the fly using your Secrets
         run: |
+          mkdir -p ~/.dbt
           echo "
           dbt_finance:
             target: dev
@@ -55,7 +55,7 @@ jobs:
                 warehouse: COMPUTE_WH
                 schema: ANALYTICS
                 threads: 1
-          " > profiles.yml
+          " > dbt_finance/profiles.yml
 
       - name: 3. Run Transformation (dbt)
         run: |
