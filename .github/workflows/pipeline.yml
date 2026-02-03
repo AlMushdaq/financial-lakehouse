@@ -38,11 +38,10 @@ jobs:
 
       - name: 2. Configure dbt Profile
         run: |
-          mkdir -p ~/.dbt
-          printf "dbt_finance:\n  target: dev\n  outputs:\n    dev:\n      type: snowflake\n      account: ${{ secrets.SNOWFLAKE_ACCOUNT }}\n      user: ${{ secrets.SNOWFLAKE_USER }}\n      password: ${{ secrets.SNOWFLAKE_PASSWORD }}\n      role: TRANSFORMER_ROLE\n      database: FINANCE_LAKE\n      warehouse: COMPUTE_WH\n      schema: ANALYTICS\n      threads: 1\n" > ~/.dbt/profiles.yml
+          printf "dbt_finance:\n  target: dev\n  outputs:\n    dev:\n      type: snowflake\n      account: ${{ secrets.SNOWFLAKE_ACCOUNT }}\n      user: ${{ secrets.SNOWFLAKE_USER }}\n      password: ${{ secrets.SNOWFLAKE_PASSWORD }}\n      role: TRANSFORMER_ROLE\n      database: FINANCE_LAKE\n      warehouse: COMPUTE_WH\n      schema: ANALYTICS\n      threads: 1\n" > dbt_finance/profiles.yml
       - name: 3. Run Transformation (dbt)
         run: |
           cd dbt_finance
-          dbt deps
-          dbt run
-          dbt test
+          dbt deps --profiles-dir .
+          dbt run --profiles-dir .
+          dbt test --profiles-dir .
