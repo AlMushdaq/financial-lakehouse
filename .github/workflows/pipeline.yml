@@ -19,8 +19,6 @@ jobs:
       SNOWFLAKE_TABLE: MARKET_DATA
       COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
       COINGECKO_API_URL: "https://api.coingecko.com/api/v3/coins/markets"
-      # This tells dbt to look for profiles.yml in the current folder
-      DBT_PROFILES_DIR: ./
 
     steps:
       - name: Checkout Code
@@ -41,22 +39,7 @@ jobs:
       - name: 2. Configure dbt Profile
         run: |
           mkdir -p ~/.dbt
-          echo "
-          dbt_finance:
-            target: dev
-            outputs:
-              dev:
-                type: snowflake
-                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-                user: ${{ secrets.SNOWFLAKE_USER }}
-                password: ${{ secrets.SNOWFLAKE_PASSWORD }}
-                role: TRANSFORMER_ROLE
-                database: FINANCE_LAKE
-                warehouse: COMPUTE_WH
-                schema: ANALYTICS
-                threads: 1
-          " > dbt_finance/profiles.yml
-
+          printf "dbt_finance:\n  target: dev\n  outputs:\n    dev:\n      type: snowflake\n      account: ${{ secrets.SNOWFLAKE_ACCOUNT }}\n      user: ${{ secrets.SNOWFLAKE_USER }}\n      password: ${{ secrets.SNOWFLAKE_PASSWORD }}\n      role: TRANSFORMER_ROLE\n      database: FINANCE_LAKE\n      warehouse: COMPUTE_WH\n      schema: ANALYTICS\n      threads: 1\n" > ~/.dbt/profiles.yml
       - name: 3. Run Transformation (dbt)
         run: |
           cd dbt_finance
